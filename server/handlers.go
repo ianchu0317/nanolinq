@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"sync"
 )
@@ -37,7 +36,11 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bodyString := string(bodyData.Url)
+	// Get URL from Body and get shorten url
+	url := bodyData.Url
+	shortenURL := createShortenURL(url)
 
-	fmt.Printf("Testing, '%s'\n", bodyString)
+	// Store new content on db
+
+	// Return response to user
 }

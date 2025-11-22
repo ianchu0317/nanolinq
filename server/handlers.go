@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sync"
 )
@@ -25,6 +26,7 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
 		http.Error(w, "Only POST Method allowed", http.StatusMethodNotAllowed)
+		return
 	}
 
 	// Read body content
@@ -40,6 +42,8 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 	url := bodyData.Url
 	shortenURL := createShortenURL(url)
 
+	//fmt.Println("url is: ", shortenURL)
+	fmt.Fprintf(w, "url is: %s\n", shortenURL)
 	// Store new content on db
 
 	// Return response to user

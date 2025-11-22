@@ -31,8 +31,7 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 	// Read body content
 	defer r.Body.Close()
 	var bodyData CreateURLData
-	err := json.NewDecoder(r.Body).Decode(&bodyData)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&bodyData); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
@@ -53,7 +52,7 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(responseData); err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "Internal server error converting to JSON", http.StatusInternalServerError)
 		return
 	}
 }

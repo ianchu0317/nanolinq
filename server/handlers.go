@@ -1,8 +1,8 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"sync"
 )
@@ -30,12 +30,14 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 
 	// Read body content
 	defer r.Body.Close()
-	bodyBytes, err := io.ReadAll(r.Body)
+	var bodyData CreateURLData
+	err := json.NewDecoder(r.Body).Decode(&bodyData)
 	if err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
 	}
 
-	bodyString := string(bodyBytes)
+	bodyString := string(bodyData.Url)
 
 	fmt.Printf("Testing, '%s'\n", bodyString)
 }

@@ -1,5 +1,7 @@
 package server
 
+import "time"
+
 // Requests body format shema
 
 type CreateURLData struct {
@@ -9,10 +11,10 @@ type CreateURLData struct {
 // Response body format schemas
 
 type ResponseCreatedURLData struct {
-	ID        int    `json:"id"`
-	URL       string `json:"url"`
-	ShortCode string `json:"shortCode"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
-	Accessed  int    `json:"accessed"`
+	ID        int       `json:"id"`
+	URL       string    `json:"url"`
+	ShortCode string    `json:"shortCode"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	Accessed  int       `json:"accessed"`
 }

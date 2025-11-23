@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sync"
 )
@@ -9,11 +10,13 @@ import (
 // Server struct and creation
 
 type shortenServer struct {
-	mu sync.Mutex
+	mu      sync.Mutex
+	_DB_URL string
 }
 
-func CreateServer() Server {
-	return &shortenServer{}
+func CreateServer(databaseURL string) Server {
+	fmt.Println(databaseURL)
+	return &shortenServer{_DB_URL: databaseURL}
 }
 
 // Server Handlers

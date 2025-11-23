@@ -23,6 +23,10 @@ func CreateServer(databaseURL string) (Server, error) {
 	return server, err
 }
 
+func (s *shortenServer) CloseServer() {
+	s.DB.Close(context.Background())
+}
+
 // Server Handlers
 
 func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {

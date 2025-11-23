@@ -22,3 +22,17 @@ func (s *shortenServer) saveShortenURL(url, shorten string) (*ResponseCreatedURL
 	//Scan(&res.ID, &res.URL, &res.ShortCode, &res.CreatedAt, &res.UpdatedAt)
 	return &res, nil
 }
+
+// isURLInDB(url) takes an URL and check if it is already in server.
+// If is in server it returns true, otherwise false
+func (s *shortenServer) isUrlInDB(url string) (bool, error) {
+	commandTag, err := s.DB.Exec(
+		context.Background(),
+		`SELECT * FROM shortened WHERE url=$1;`,
+		url,
+	)
+	if err != nil {
+		return false, err
+	}
+	return commandTag.RowsAffected() >= 1, nil
+}

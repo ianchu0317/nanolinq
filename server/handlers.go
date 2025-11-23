@@ -56,8 +56,17 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get URL from Body and get shorten url
+	// Get URL from Body and get shorten url (if its unique)
 	url := bodyData.Url
+	urlInDB, err := s.isUrlInDB(url)
+	if err != nil {
+		http.Error(w, "Internal server error checking url in db", http.StatusInternalServerError)
+		return
+	}
+	if urlInDB {
+		http.Error(w, "URL already in DB", http.StatusConflict)
+		return
+	}
 	shortenURL := createShortenURL(url)
 
 	// Store new content on db

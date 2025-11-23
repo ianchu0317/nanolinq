@@ -17,14 +17,17 @@ func main() {
 
 	// Create Server
 	app, err := server.CreateServer(os.Getenv("DATABASE_URL"))
-	defer app.CloseServer()
-
 	if err != nil {
 		log.Fatalf("DB connection error, %v", err)
-		app.CloseServer()
 	}
+	defer app.CloseServer()
 
-	// Start server
-	http.HandleFunc("/shorten", app.CreateURL)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// Start server (go routine)
+	go func() {
+		http.HandleFunc("/shorten", app.CreateURL)
+		log.Println("Server starting on :8080")
+		if err := http.ListenAndServe(":8080", nil); err != nil {
+			log.Fatal("Failed starting server")
+		}
+	}()
 }

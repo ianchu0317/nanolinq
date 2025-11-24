@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -97,8 +96,18 @@ func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	shortCode := r.PathValue("shortCode")
-	fmt.Fprintf(w, "short code is: %s", shortCode)
+
 	// Check if url-short code in server
+	shortInDB, err := s.isShortCodeInDB(shortCode)
+	if err != nil {
+		log.Fatalf("Error checking short code in db, %v", err)
+		http.Error(w, "Error checking short code in db", http.StatusInternalServerError)
+		return
+	}
+	if !shortInDB {
+		http.Error(w, "Error short code not in db", http.StatusBadRequest)
+		return
+	}
 
 	// Update Access Counter / Get original url
 	responseData, err := s.retrieveOriginalURL(shortCode)
@@ -106,9 +115,10 @@ func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Error retrieving url from DB, %v", err)
 		http.Error(w, "Error retrieving url from DB", http.StatusInternalServerError)
 	}
+
 	// Return original url -> Redirect
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(responseData); err != nil {
 		log.Fatalf("Internal server error converting to JSON, %v", err)
 		http.Error(w, "Internal server error converting to JSON", http.StatusInternalServerError)

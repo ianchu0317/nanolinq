@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -87,4 +88,14 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error converting to JSON", http.StatusInternalServerError)
 		return
 	}
+}
+
+func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
+	shortCode := r.PathValue("shortCode")
+	fmt.Fprintf(w, "short code is: %s", shortCode)
+
+	// Check GET Method only
+	// Check if url-short code in server
+	// Update Access Counter
+	// Return original url -> Redirect
 }

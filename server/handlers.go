@@ -95,7 +95,12 @@ func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "short code is: %s", shortCode)
 
 	// Check GET Method only
+	if r.Method != "GET" {
+		http.Error(w, "Only GET Method allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	// Check if url-short code in server
+
 	// Update Access Counter
 	// Return original url -> Redirect
 }

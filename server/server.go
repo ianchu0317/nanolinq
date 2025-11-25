@@ -12,4 +12,8 @@ type Server interface {
 	// RetrieveURL retrieves the original url with shortCode
 	// Handles GET requests from GET /shorten/{shortCode}
 	RetrieveURL(w http.ResponseWriter, r *http.Request)
+
+	// UpdateURL updates the original url given a shortCode
+	// Handles PUT requests from PUT /shorten/{shortCode}
+	UpdateURL(w http.ResponseWriter, r *http.Request)
 }

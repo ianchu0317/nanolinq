@@ -128,3 +128,7 @@ func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
 		}
 	*/
 }
+
+func (s *shortenServer) UpdateURL(w http.ResponseWriter, r *http.Request) {
+
+}

@@ -23,6 +23,22 @@ func (s *shortenServer) saveShortenURL(url, shortCode string) (*ResponseCreatedU
 	return &res, nil
 }
 
+// retrieveOriginalURL(shortCode) returns the original URL given a shortCode. IF not found then will return ""
+func (s *shortenServer) retrieveOriginalURL(shortCode string) (*ResponseCreatedURLData, error) {
+	// Check short code on server
+	var res ResponseCreatedURLData
+	err := s.DB.QueryRow(
+		context.Background(),
+		`UPDATE shortened SET accessed=(accessed+1) WHERE short_code=$1
+		RETURNING id, url, short_code, created_at, updated_at, accessed`,
+		shortCode,
+	).Scan(&res.ID, &res.URL, &res.ShortCode, &res.CreatedAt, &res.UpdatedAt, &res.Accessed)
+	if err != nil {
+		return nil, nil
+	}
+	return &res, nil
+}
+
 // isURLInDB(url) takes an URL and check if it is already in server.
 // If is in server it returns true, otherwise false
 func (s *shortenServer) isUrlInDB(url string) (bool, error) {
@@ -30,6 +46,20 @@ func (s *shortenServer) isUrlInDB(url string) (bool, error) {
 		context.Background(),
 		`SELECT * FROM shortened WHERE url=$1;`,
 		url,
+	)
+	if err != nil {
+		return false, err
+	}
+	return commandTag.RowsAffected() >= 1, nil
+}
+
+// isShortCodeInDB(shortCode) takes a short code and check if it is already in DB
+// If is in server it returns true, otherwise false
+func (s *shortenServer) isShortCodeInDB(shortCode string) (bool, error) {
+	commandTag, err := s.DB.Exec(
+		context.Background(),
+		`SELECT * FROM shortened WHERE short_code=$1;`,
+		shortCode,
 	)
 	if err != nil {
 		return false, err

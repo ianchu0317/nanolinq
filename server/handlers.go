@@ -88,3 +88,43 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
+	// Check GET Method only
+	if r.Method != "GET" {
+		http.Error(w, "Only GET Method allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	shortCode := r.PathValue("shortCode")
+
+	// Check if url-short code in server
+	shortInDB, err := s.isShortCodeInDB(shortCode)
+	if err != nil {
+		log.Fatalf("Error checking short code in db, %v", err)
+		http.Error(w, "Error checking short code in db", http.StatusInternalServerError)
+		return
+	}
+	if !shortInDB {
+		http.Error(w, "Error short code not in db", http.StatusBadRequest)
+		return
+	}
+
+	// Update Access Counter / Get original url
+	responseData, err := s.retrieveOriginalURL(shortCode)
+	if err != nil {
+		log.Fatalf("Error retrieving url from DB, %v", err)
+		http.Error(w, "Error retrieving url from DB", http.StatusInternalServerError)
+	}
+
+	// Return original url -> Redirect
+	http.Redirect(w, r, responseData.URL, http.StatusMovedPermanently)
+	/*
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(responseData); err != nil {
+			log.Fatalf("Internal server error converting to JSON, %v", err)
+			http.Error(w, "Internal server error converting to JSON", http.StatusInternalServerError)
+			return
+		}
+	*/
+}

@@ -1,6 +1,8 @@
 package server
 
-import "context"
+import (
+	"context"
+)
 
 // save new url to server
 
@@ -38,6 +40,26 @@ func (s *shortenServer) retrieveOriginalURL(shortCode string) (*ResponseCreatedU
 	}
 	return &res, nil
 }
+
+// updateOriginalURL takes new url and a shortCode. After created will return the updated data.
+func (s *shortenServer) updateOriginalURL(newURL, shortCode string) (*ResponseCreatedURLData, error) {
+	var res ResponseCreatedURLData
+	err := s.DB.QueryRow(
+		context.Background(),
+		`UPDATE shortened
+		SET url=$1, updated_at=NOW()
+		WHERE short_code=$2
+		RETURNING id, url, short_code, created_at, updated_at, accessed`,
+		newURL,
+		shortCode,
+	).Scan(&res.ID, &res.URL, &res.ShortCode, &res.CreatedAt, &res.UpdatedAt, &res.Accessed)
+	if err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+// Auxiliar functions check if
 
 // isURLInDB(url) takes an URL and check if it is already in server.
 // If is in server it returns true, otherwise false

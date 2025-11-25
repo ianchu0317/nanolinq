@@ -31,7 +31,7 @@ func main() {
 	// Start server (go routine)
 	go func() {
 		http.HandleFunc("/shorten", app.CreateURL)
-		http.HandleFunc("/shorten/{shortCode}", app.RetrieveURL)
+		http.HandleFunc("/shorten/{shortCode}", app.HandleShortCode)
 
 		log.Println("Server starting on :8080")
 		if err := http.ListenAndServe(":8080", nil); err != nil {

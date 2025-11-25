@@ -16,4 +16,7 @@ type Server interface {
 	// UpdateURL updates the original url given a shortCode
 	// Handles PUT requests from PUT /shorten/{shortCode}
 	UpdateURL(w http.ResponseWriter, r *http.Request)
+
+	// Handles Requests from endpoint /shorten/{shortCode}
+	HandleShortCode(w http.ResponseWriter, r *http.Request)
 }

@@ -90,11 +90,6 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
-	// Check GET Method only
-	if r.Method != "GET" {
-		http.Error(w, "Only GET Method allowed", http.StatusMethodNotAllowed)
-		return
-	}
 	shortCode := r.PathValue("shortCode")
 
 	// Check if url-short code in server
@@ -131,4 +126,15 @@ func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
 
 func (s *shortenServer) UpdateURL(w http.ResponseWriter, r *http.Request) {
 
+}
+
+func (s *shortenServer) HandleShortCode(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		s.RetrieveURL(w, r)
+	case http.MethodPut:
+		s.UpdateURL(w, r)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
 }

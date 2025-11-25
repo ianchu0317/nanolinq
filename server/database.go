@@ -39,6 +39,12 @@ func (s *shortenServer) retrieveOriginalURL(shortCode string) (*ResponseCreatedU
 	return &res, nil
 }
 
+func (s *shortenServer) updateOriginalURL(newURL, shortCode string) (*ResponseCreatedURLData, error) {
+	var res ResponseCreatedURLData
+
+	return &res, nil
+}
+
 // isURLInDB(url) takes an URL and check if it is already in server.
 // If is in server it returns true, otherwise false
 func (s *shortenServer) isUrlInDB(url string) (bool, error) {

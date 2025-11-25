@@ -125,7 +125,21 @@ func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *shortenServer) UpdateURL(w http.ResponseWriter, r *http.Request) {
+	// Get short code
+	shortCode := r.PathValue("shortCode")
 
+	// Read body data
+	defer r.Body.Close()
+	var bodyData CreateURLData
+	if err := json.NewDecoder(r.Body).Decode(&bodyData); err != nil {
+		log.Fatalf("Internal server error decoding body, %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// Update data in DB
+
+	// Return to user data
 }
 
 func (s *shortenServer) HandleShortCode(w http.ResponseWriter, r *http.Request) {

@@ -119,6 +119,12 @@ func (s *shortenServer) UpdateURL(w http.ResponseWriter, r *http.Request) {
 	ReturnJSON(w, r, responseData, http.StatusOK)
 }
 
+func (s *shortenServer) DeleteURL(w http.ResponseWriter, r *http.Request) {
+	// Get shorten Code
+	// Delete from DB
+	// Return No Content if success
+}
+
 func (s *shortenServer) HandleShortCode(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:

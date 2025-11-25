@@ -121,7 +121,14 @@ func (s *shortenServer) UpdateURL(w http.ResponseWriter, r *http.Request) {
 
 func (s *shortenServer) DeleteURL(w http.ResponseWriter, r *http.Request) {
 	// Get shorten Code
+	shortCode := r.PathValue("shortCode")
+
 	// Delete from DB
+	err := s.deleteShortCode(shortCode)
+	if err != nil {
+		ReturnError(w, err, "Error deleting url from DB", http.StatusInternalServerError)
+		return
+	}
 	// Return No Content if success
 }
 

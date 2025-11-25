@@ -117,11 +117,14 @@ func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return original url -> Redirect
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(responseData); err != nil {
-		log.Fatalf("Internal server error converting to JSON, %v", err)
-		http.Error(w, "Internal server error converting to JSON", http.StatusInternalServerError)
-		return
-	}
+	http.Redirect(w, r, responseData.URL, http.StatusMovedPermanently)
+	/*
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(responseData); err != nil {
+			log.Fatalf("Internal server error converting to JSON, %v", err)
+			http.Error(w, "Internal server error converting to JSON", http.StatusInternalServerError)
+			return
+		}
+	*/
 }

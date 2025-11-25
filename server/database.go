@@ -59,6 +59,19 @@ func (s *shortenServer) updateOriginalURL(newURL, shortCode string) (*ResponseCr
 	return &res, nil
 }
 
+func (s *shortenServer) deleteShortCode(shortCode string) error {
+	_, err := s.DB.Exec(
+		context.Background(),
+		`DELETE FROM shortened 
+		WHERE short_code=$1`,
+		shortCode,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Auxiliar functions check if
 
 // isURLInDB(url) takes an URL and check if it is already in server.

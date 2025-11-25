@@ -119,12 +119,39 @@ func (s *shortenServer) UpdateURL(w http.ResponseWriter, r *http.Request) {
 	ReturnJSON(w, r, responseData, http.StatusOK)
 }
 
+func (s *shortenServer) DeleteURL(w http.ResponseWriter, r *http.Request) {
+	// Get shorten Code
+	shortCode := r.PathValue("shortCode")
+
+	// Check if shorten Code is in DB
+	shortInDB, err := s.isShortCodeInDB(shortCode)
+	if err != nil {
+		ReturnError(w, err, "Error accessing DB", http.StatusInternalServerError)
+		return
+	}
+	if !shortInDB {
+		ReturnError(w, nil, "Invalid short code", http.StatusNotFound)
+		return
+	}
+
+	// Delete from DB
+	err = s.deleteShortCode(shortCode)
+	if err != nil {
+		ReturnError(w, err, "Error deleting url from DB", http.StatusInternalServerError)
+		return
+	}
+	// Return No Content if success
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (s *shortenServer) HandleShortCode(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		s.RetrieveURL(w, r)
 	case http.MethodPut:
 		s.UpdateURL(w, r)
+	case http.MethodDelete:
+		s.DeleteURL(w, r)
 	default:
 		ReturnError(w, nil, "Method not allowed", http.StatusMethodNotAllowed)
 	}

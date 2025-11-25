@@ -17,6 +17,10 @@ type Server interface {
 	// Handles PUT requests from PUT /shorten/{shortCode}
 	UpdateURL(w http.ResponseWriter, r *http.Request)
 
+	// DeleteURL deletes the original url and associated shortCode
+	// Handles DELETE requests from DELETE /shorten/{shortCode}
+	DeleteURL(w http.ResponseWriter, r *http.Request)
+
 	// Handles Requests from endpoint /shorten/{shortCode}
 	HandleShortCode(w http.ResponseWriter, r *http.Request)
 }

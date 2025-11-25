@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
@@ -129,23 +128,4 @@ func (s *shortenServer) HandleShortCode(w http.ResponseWriter, r *http.Request) 
 	default:
 		ReturnError(w, nil, "Method not allowed", http.StatusMethodNotAllowed)
 	}
-}
-
-// Helpers - Auxiliar functions
-
-// ReturnJSON take a request and respond with JSON
-func ReturnJSON(w http.ResponseWriter, r *http.Request, responseData *ResponseCreatedURLData, statusCode int) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	if err := json.NewEncoder(w).Encode(responseData); err != nil {
-		log.Fatalf("Internal server error converting to JSON, %v", err)
-		http.Error(w, "Internal server error converting to JSON", http.StatusInternalServerError)
-		return
-	}
-}
-
-// ReturnError takes an error, message and status code and returns error to user / and log
-func ReturnError(w http.ResponseWriter, err error, message string, statusCode int) {
-	log.Printf("%s: %v", message, err)
-	http.Error(w, message, statusCode)
 }

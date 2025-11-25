@@ -43,40 +43,29 @@ func (s *shortenServer) CloseServer() {
 // Server Handlers
 
 func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
-	// Check method for this endpoint
-	if r.Method != "POST" {
-		http.Error(w, "Only POST Method allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	// Read body content
 	defer r.Body.Close()
 	var bodyData CreateURLData
 	if err := json.NewDecoder(r.Body).Decode(&bodyData); err != nil {
-		log.Fatalf("Internal server error decoding body, %v", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		ReturnError(w, err, "Bad Request", http.StatusBadRequest)
 		return
 	}
-
 	// Get URL from Body and get shorten url (if its unique)
 	url := bodyData.Url
 	urlInDB, err := s.isUrlInDB(url)
 	if err != nil {
-		log.Fatalf("Internal server error checking url in db, %v", err)
-		http.Error(w, "Internal server error checking url in db", http.StatusInternalServerError)
+		ReturnError(w, err, "Internal server error checking url in db", http.StatusInternalServerError)
 		return
 	}
 	if urlInDB {
-		http.Error(w, "URL already in DB", http.StatusConflict)
+		ReturnError(w, err, "URL already in DB", http.StatusConflict)
 		return
 	}
 	shortCode := createShortCode(url)
-
 	// Store new content on db
 	responseData, err := s.saveShortenURL(url, shortCode)
 	if err != nil {
-		log.Fatalf("Internal server error saving to db, %v", err)
-		http.Error(w, "Internal server error saving to db", http.StatusInternalServerError)
+		ReturnError(w, err, "Internal server error with DB", http.StatusInternalServerError)
 		return
 	}
 	// Return response to user
@@ -89,20 +78,19 @@ func (s *shortenServer) RetrieveURL(w http.ResponseWriter, r *http.Request) {
 	// Check if url-short code in server
 	shortInDB, err := s.isShortCodeInDB(shortCode)
 	if err != nil {
-		log.Fatalf("Error checking short code in db, %v", err)
-		http.Error(w, "Error checking short code in db", http.StatusInternalServerError)
+		ReturnError(w, err, "Error checking short code in db", http.StatusInternalServerError)
 		return
 	}
 	if !shortInDB {
-		http.Error(w, "Error short code not in db", http.StatusBadRequest)
+		ReturnError(w, err, "Error short code not in db", http.StatusBadRequest)
 		return
 	}
 
 	// Update Access Counter / Get original url
 	responseData, err := s.retrieveOriginalURL(shortCode)
 	if err != nil {
-		log.Fatalf("Error retrieving url from DB, %v", err)
-		http.Error(w, "Error retrieving url from DB", http.StatusInternalServerError)
+		ReturnError(w, err, "Error retrieving url from DB", http.StatusInternalServerError)
+		return
 	}
 
 	// Return original url -> Redirect
@@ -117,16 +105,15 @@ func (s *shortenServer) UpdateURL(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var bodyData CreateURLData
 	if err := json.NewDecoder(r.Body).Decode(&bodyData); err != nil {
-		log.Fatalf("Internal server error decoding body, %v", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		ReturnError(w, err, "Internal server error decoding body", http.StatusBadRequest)
 		return
 	}
 
 	// Update data in DB
 	responseData, err := s.updateOriginalURL(bodyData.Url, shortCode)
 	if err != nil {
-		log.Fatalf("Error updating url from DB, %v", err)
-		http.Error(w, "Error updating url from DB", http.StatusInternalServerError)
+		ReturnError(w, err, "Error updating url from DB", http.StatusInternalServerError)
+		return
 	}
 
 	// Return JSON to user data
@@ -140,11 +127,12 @@ func (s *shortenServer) HandleShortCode(w http.ResponseWriter, r *http.Request) 
 	case http.MethodPut:
 		s.UpdateURL(w, r)
 	default:
+		ReturnError(w, nil, "Method not allowed", http.StatusMethodNotAllowed)
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
 
-// Helpers
+// Helpers - Auxiliar functions
 
 // ReturnJSON take a request and respond with JSON
 func ReturnJSON(w http.ResponseWriter, r *http.Request, responseData *ResponseCreatedURLData, statusCode int) {
@@ -155,4 +143,10 @@ func ReturnJSON(w http.ResponseWriter, r *http.Request, responseData *ResponseCr
 		http.Error(w, "Internal server error converting to JSON", http.StatusInternalServerError)
 		return
 	}
+}
+
+// ReturnError takes an error, message and status code and returns error to user / and log
+func ReturnError(w http.ResponseWriter, err error, message string, statusCode int) {
+	log.Printf("%s: %v", message, err)
+	http.Error(w, message, statusCode)
 }

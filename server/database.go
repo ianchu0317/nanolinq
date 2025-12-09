@@ -31,8 +31,7 @@ func (s *shortenServer) retrieveOriginalURL(shortCode string) (*ResponseCreatedU
 	var res ResponseCreatedURLData
 	err := s.DB.QueryRow(
 		context.Background(),
-		`UPDATE shortened SET accessed=(accessed+1) WHERE short_code=$1
-		RETURNING id, url, short_code, created_at, updated_at, accessed`,
+		`SELECT * from shortened WHERE short_code=$1`,
 		shortCode,
 	).Scan(&res.ID, &res.URL, &res.ShortCode, &res.CreatedAt, &res.UpdatedAt, &res.Accessed)
 	if err != nil {

@@ -52,3 +52,28 @@ The endpoint should return a `200 OK` status code and redirect to original URL.
 If not found (short code doesn't exist), it will return `404 Not Found`.
 
 
+### Update Short URL
+
+Update an existing short URL using the `PUT` method
+
+```
+PUT /shorten/abc123
+{
+  "url": "https://www.example.com/some/updated/url"
+}
+```
+
+The endpoint validate the request body and return a `200 OK` status code with the updated short URL i.e.
+
+```
+{
+    "id": 1,
+    "url": "https://www.example.com/some/updated/url",
+    "shortCode": "813a43f95e",
+    "createdAt": "2025-12-18T13:00:54.837205Z",
+    "updatedAt": "2025-12-18T13:01:37.485254Z",
+    "accessed": 3
+}
+```
+
+It returns `400 Bad Request` if have bad requests or `404 Not Found` if status code not in server.

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"url-shortening/server"
 
@@ -17,8 +18,15 @@ func main() {
 		log.Println("No .env file found or couldn't load it; falling back to environment variables")
 	}
 
+	// Get .env variables values
+	shortCodeLen, err := strconv.Atoi(os.Getenv("SHORT_CODE_LEN"))
+	if err != nil {
+		log.Fatalf("Error loading SHORT_CODE_LEN")
+	}
+	databaseURL := os.Getenv("DATABASE_URL")
+
 	// Create Server
-	app, err := server.CreateServer(os.Getenv("DATABASE_URL"))
+	app, err := server.CreateServer(databaseURL, shortCodeLen)
 	if err != nil {
 		log.Fatalf("DB connection error, %v", err)
 	}

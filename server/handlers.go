@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -12,12 +13,13 @@ import (
 // Server struct and creation
 
 type shortenServer struct {
-	DB *pgxpool.Pool
+	DB           *pgxpool.Pool
+	shortCodeLen int
 }
 
 // CreateServer(url) takes a database url and starts connection and initial configuration
 // if success, will return the server, if not err != nil
-func CreateServer(databaseURL string) (Server, error) {
+func CreateServer(databaseURL string, shortCodeLen int) (Server, error) {
 	server := &shortenServer{}
 	// Configuration for psql pool
 	config, err := pgxpool.ParseConfig(databaseURL)
@@ -32,6 +34,7 @@ func CreateServer(databaseURL string) (Server, error) {
 		return nil, err
 	}
 	server.DB = pool
+	server.shortCodeLen = shortCodeLen
 	return server, err
 }
 
@@ -44,30 +47,43 @@ func (s *shortenServer) CloseServer() {
 func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 	// Read body content
 	defer r.Body.Close()
+	// 400 Bad Request (JSON Bad request)
 	var bodyData CreateURLData
 	if err := json.NewDecoder(r.Body).Decode(&bodyData); err != nil {
 		ReturnError(w, err, "Bad Request", http.StatusBadRequest)
 		return
 	}
-	// Get URL from Body and get shorten url (if its unique)
-	url := bodyData.Url
-	urlInDB, err := s.isUrlInDB(url)
+
+	// Verify URL
+	_url := bodyData.Url
+	// 400 Bad Request (invalid URL)
+	_, err := url.ParseRequestURI(_url)
 	if err != nil {
-		ReturnError(w, err, "Internal server error checking url in db", http.StatusInternalServerError)
+		ReturnError(w, err, "Invalid URL", http.StatusBadRequest)
 		return
 	}
-	if urlInDB {
-		ReturnError(w, err, "URL already in DB", http.StatusConflict)
-		return
+
+	// Create Random URL Short code
+	shortInDB := true
+	var shortCode string
+	for shortInDB {
+		shortCode = createShortCode(s.shortCodeLen)
+		shortInDB, err = s.isShortCodeInDB(shortCode)
+		// ERROR with database connection
+		if err != nil {
+			ReturnError(w, err, "Error checking short code in db", http.StatusInternalServerError)
+			return
+		}
 	}
-	shortCode := createShortCode(url)
+
 	// Store new content on db
-	responseData, err := s.saveShortenURL(url, shortCode)
+	responseData, err := s.saveShortenURL(_url, shortCode)
 	if err != nil {
 		ReturnError(w, err, "Internal server error with DB", http.StatusInternalServerError)
 		return
 	}
-	// Return response to user
+
+	// Return response to user (STATUS OK)
 	ReturnJSON(w, r, responseData, http.StatusCreated)
 }
 

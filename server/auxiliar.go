@@ -9,14 +9,13 @@ import (
 )
 
 const (
-	SHORTEN_LEN = 5
-	CHARSET     = "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	CHARSET = "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 // createShortenURL takes a string and returns a shorten version of it (hash)
-func createShortCode() string {
+func createShortCode(shortCodeLen int) string {
 	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
-	b := make([]byte, SHORTEN_LEN)
+	b := make([]byte, shortCodeLen)
 	for i := range b {
 		b[i] = CHARSET[seededRand.Intn(len(CHARSET))]
 	}

@@ -13,12 +13,13 @@ import (
 // Server struct and creation
 
 type shortenServer struct {
-	DB *pgxpool.Pool
+	DB           *pgxpool.Pool
+	shortCodeLen int
 }
 
 // CreateServer(url) takes a database url and starts connection and initial configuration
 // if success, will return the server, if not err != nil
-func CreateServer(databaseURL string) (Server, error) {
+func CreateServer(databaseURL string, shortCodeLen int) (Server, error) {
 	server := &shortenServer{}
 	// Configuration for psql pool
 	config, err := pgxpool.ParseConfig(databaseURL)
@@ -33,6 +34,7 @@ func CreateServer(databaseURL string) (Server, error) {
 		return nil, err
 	}
 	server.DB = pool
+	server.shortCodeLen = shortCodeLen
 	return server, err
 }
 
@@ -65,7 +67,7 @@ func (s *shortenServer) CreateURL(w http.ResponseWriter, r *http.Request) {
 	shortInDB := true
 	var shortCode string
 	for shortInDB {
-		shortCode = createShortCode()
+		shortCode = createShortCode(s.shortCodeLen)
 		shortInDB, err = s.isShortCodeInDB(shortCode)
 		// ERROR with database connection
 		if err != nil {

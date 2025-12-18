@@ -1,11 +1,29 @@
 # url-shortening
 Simple URL Shortening Service in Go
 
+## Getting Started
+
+To run and deploy the server run the following commands in order
+
+```bash
+# Clone the repo
+git clone https://github.com/ianchu0317/url-shortening.git
+# Enter the folder
+cd url-shortening
+# Deploy server
+docker compose up -d
+```
+Then the services will be open in:
+- `8080` -> API / Shortener Backend
+- `80`   -> HTTP / Frontend Server 
+- `5432` -> DB 
+
+
 ## Project To Do List
 - [X] Basic shortening features (`roadmap.sh`)
 - [X] Endpoints Testing
 - [X] Endpoints Documentation
-- [ ] Create Docker Compose
+- [X] Create Docker Compose
 - [ ] Basic Deploy: CI/CD
     - Buy Domain and VPS
 - [ ] Create Frontend

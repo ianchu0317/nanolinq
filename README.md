@@ -1,11 +1,29 @@
 # url-shortening
 Simple URL Shortening Service in Go
 
+## Getting Started
+
+To run and deploy the server run the following commands in order
+
+```bash
+# Clone the repo
+git clone https://github.com/ianchu0317/url-shortening.git
+# Enter the folder
+cd url-shortening
+# Deploy server
+docker compose up -d
+```
+Then the services will be open in:
+- `8080` -> API / Shortener Backend
+- `80`   -> HTTP / Frontend Server 
+- `5432` -> DB 
+
+
 ## Project To Do List
 - [X] Basic shortening features (`roadmap.sh`)
 - [X] Endpoints Testing
 - [X] Endpoints Documentation
-- [ ] Create Docker Compose
+- [X] Create Docker Compose
 - [ ] Basic Deploy: CI/CD
     - Buy Domain and VPS
 - [ ] Create Frontend
@@ -46,7 +64,7 @@ It returns `400 Bad Request` in case of URL validation errors.
 Retrieve the original URL from a short URL using the `GET` method.
 
 ```
-GET /shorten/abc123
+GET /abc123
 ```
 
 The endpoint should return a `200 OK` status code and redirect to original URL.
@@ -59,7 +77,7 @@ If not found (short code doesn't exist), it will return `404 Not Found`.
 Update an existing short URL using the `PUT` method
 
 ```
-PUT /shorten/abc123
+PUT /abc123
 {
   "url": "https://www.example.com/some/updated/url"
 }
@@ -86,7 +104,7 @@ It returns `400 Bad Request` if have bad requests or `404 Not Found` if status c
 Delete an existing short URL using the `DELETE` method.
 
 ```
-DELETE /shorten/abc123
+DELETE /abc123
 ```
 
 The endpoint should return a `204 No Content` status code if the short URL was successfully deleted or a `404 Not Found` status code if the short URL was not found.
@@ -97,7 +115,7 @@ The endpoint should return a `204 No Content` status code if the short URL was s
 Get statistics for a short URL using the `GET` method
 
 ```
-GET /shorten/abc123/stats
+GET /abc123/stats
 ```
 
 The endpoint should return a 200 OK status code with the statistics i.e.

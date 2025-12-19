@@ -17,7 +17,7 @@ jobs:
           git pull
       
       - name: Restart containers
-        workin-directory: ~/nanolinq
+        working-directory: ~/nanolinq
         run: |
           docker compose down 
           docker compose up -d --build

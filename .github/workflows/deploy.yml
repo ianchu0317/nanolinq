@@ -1,0 +1,23 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    
+    steps:      
+      - name: Get Into Repository and Update
+        working-directory: ~/nanolinq
+        run: |
+          git checkout main
+          git pull
+      
+      - name: Restart containers
+        workin-directory: ~/nanolinq
+        run: |
+          docker compose down 
+          docker compose up -d --build
